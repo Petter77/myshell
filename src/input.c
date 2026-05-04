@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "../include/input.h"
+#include "../include/command.h"
 
 #define BUFFER_SIZE 1024
 
@@ -14,10 +15,11 @@ char* get_input() {
   return input;
 }
 
-char **get_args(char *input) {
+command_t* get_args(char *input) {
+  command_t* command = malloc(sizeof(command_t));
   int cap = 2;
   int count = 0;
-  char **args = malloc(sizeof(char *) * cap);
+  command->args = malloc(sizeof(char *) * cap);
 
   char *start = input;
   while (*start != '\0') {
@@ -34,13 +36,13 @@ char **get_args(char *input) {
 
     if (count + 1 >= cap) {
       cap *= 2;
-      args = realloc(args, sizeof(char *) * cap);
+      command->args = realloc(command->args, sizeof(char *) * cap);
     }
-    args[count++] = token;
+    command->args[count++] = token;
 
     start = end;
   }
 
-  args[count] = NULL;
-  return args;
+  command->args[count] = NULL;
+  return command;
 }
