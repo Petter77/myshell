@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/wait.h>
-#include <string.h>
+#include <stdio.h>
 
 #include "../include/input.h"
 #include "../include/execute.h"
@@ -16,14 +16,14 @@ void shell_loop(void) {
   do {
     print_indicator(proc_status);
     input = get_input();
-    command_t* command = get_args(input);
-    command = get_args(input);
+    char** args = get_args(input);
 
-    if (command->args[0] == NULL) continue;
-    execute(command->args, &proc_status);
+    if (args[0] == NULL) continue;
+    command_t cmd = parse_command(args);
+    execute(cmd, &proc_status);
 
     free(input);
-    command_free(command);
+    free_args(args);
   } while (should_run);
 }
 

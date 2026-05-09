@@ -4,6 +4,7 @@
 #include <sys/wait.h>
 #include <stdio.h>
 
+#include "../include/command.h"
 
 int shell_scripts(char** args, int* proc_status) {
   // exit
@@ -31,15 +32,15 @@ int shell_scripts(char** args, int* proc_status) {
   return 0;
 }
 
-void execute(char** args, int* proc_status) {
-  int should_return = shell_scripts(args, proc_status);
+void execute(command_t cmd, int* proc_status) {
+  int should_return = shell_scripts(cmd.args, proc_status);
   if (should_return) {
     return;
   }
 
   pid_t pid = fork();
   if (pid == 0) {
-    execvp(args[0], args);
+    execvp(cmd.args[0], cmd.args);
   } else {
     waitpid(pid, proc_status, 0);
   }

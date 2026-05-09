@@ -3,7 +3,6 @@
 #include <string.h>
 
 #include "../include/input.h"
-#include "../include/command.h"
 
 #define BUFFER_SIZE 1024
 
@@ -15,11 +14,10 @@ char* get_input() {
   return input;
 }
 
-command_t* get_args(char *input) {
-  command_t* command = malloc(sizeof(command_t));
+char **get_args(char *input) {
   int cap = 2;
   int count = 0;
-  command->args = malloc(sizeof(char *) * cap);
+  char **args = malloc(sizeof(char *) * cap);
 
   char *start = input;
   while (*start != '\0') {
@@ -36,13 +34,46 @@ command_t* get_args(char *input) {
 
     if (count + 1 >= cap) {
       cap *= 2;
-      command->args = realloc(command->args, sizeof(char *) * cap);
+      args = realloc(args, sizeof(char *) * cap);
     }
-    command->args[count++] = token;
-
+    args[count++] = token;
+    
     start = end;
   }
 
-  command->args[count] = NULL;
-  return command;
+  args[count] = NULL;
+  return args;
+}
+
+command_t parse_command(char **args) {
+    command_t cmd;
+    cmd.args = args;
+    cmd.redirect_in = NULL;
+    cmd.redirect_out = NULL;
+    cmd.append = 0;
+
+    for (int i = 0; args[i] != NULL; i++) {
+        if (strcmp(args[i], ">") == 0 && args[i+1] != NULL) {
+            cmd.redirect_out = args[i+1];
+            cmd.append = 0;
+            args[i] = NULL;
+        } else if (strcmp(args[i], ">>") == 0 && args[i+1] != NULL) {
+            cmd.redirect_out = args[i+1];
+            cmd.append = 1;
+            args[i] = NULL;
+        } else if (strcmp(args[i], "<") == 0 && args[i+1] != NULL) {
+            cmd.redirect_in = args[i+1];
+            args[i] = NULL;
+        }
+    }
+
+    return cmd;
+}
+
+void free_args(char **args) {
+    if (args == NULL) return;
+    for (int i = 0; args[i] != NULL; i++) {
+        free(args[i]);
+    }
+    free(args);
 }
