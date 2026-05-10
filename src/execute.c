@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <stdio.h>
+#include <fcntl.h>
 
 #include "../include/command.h"
 
@@ -40,6 +41,12 @@ void execute(command_t cmd, int* proc_status) {
 
   pid_t pid = fork();
   if (pid == 0) {
+    if (cmd.redirect_out) {
+      int flags = O_WRONLY | O_CREAT | (cmd.append ? O_APPEND : O_TRUNC);
+      int fd = open(cmd.redirect_out, flags, 0644);
+      dup2(fd, STDOUT_FILENO);
+      close(fd);
+    }
     execvp(cmd.args[0], cmd.args);
   } else {
     waitpid(pid, proc_status, 0);
