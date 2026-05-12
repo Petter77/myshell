@@ -6,6 +6,5 @@
 char* get_input();
 char** get_args(char *input);
 command_t parse_command(char** args);
-void free_args(char **args);
 
 #endif  // MYSHELL_INCLUDE_INPUT_H_

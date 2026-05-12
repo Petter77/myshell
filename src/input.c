@@ -53,27 +53,24 @@ command_t parse_command(char **args) {
     cmd.append = 0;
 
     for (int i = 0; args[i] != NULL; i++) {
-        if (strcmp(args[i], ">") == 0 && args[i+1] != NULL) {
-            cmd.redirect_out = args[i+1];
-            cmd.append = 0;
-            args[i] = NULL;
-        } else if (strcmp(args[i], ">>") == 0 && args[i+1] != NULL) {
-            cmd.redirect_out = args[i+1];
-            cmd.append = 1;
-            args[i] = NULL;
-        } else if (strcmp(args[i], "<") == 0 && args[i+1] != NULL) {
-            cmd.redirect_in = args[i+1];
-            args[i] = NULL;
-        }
+      if (strcmp(args[i], ">") == 0 && args[i+1] != NULL) {
+        cmd.redirect_out = args[i+1];
+        cmd.append = 0;
+        free(args[i]);
+        args[i] = NULL;
+        args[i+1] = NULL;       
+      } else if (strcmp(args[i], ">>") == 0 && args[i+1] != NULL) {
+        cmd.redirect_out = args[i+1];
+        cmd.append = 1;
+        free(args[i]);
+        args[i] = NULL;
+        args[i+1] = NULL;       
+        free(args[i]);
+      } else if (strcmp(args[i], "<") == 0 && args[i+1] != NULL) {
+        cmd.redirect_in = args[i+1];
+      }
     }
 
     return cmd;
 }
 
-void free_args(char **args) {
-    if (args == NULL) return;
-    for (int i = 0; args[i] != NULL; i++) {
-        free(args[i]);
-    }
-    free(args);
-}

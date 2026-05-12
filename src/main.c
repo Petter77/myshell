@@ -18,12 +18,18 @@ void shell_loop(void) {
     input = get_input();
     char** args = get_args(input);
 
-    if (args[0] == NULL) continue;
+    if (args[0] == NULL) {
+      for (int i = 0; args[i] != NULL; i++) {
+        free(args[i]);
+      }
+      free(input);
+      continue;
+    }
     command_t cmd = parse_command(args);
     execute(cmd, &proc_status);
 
     free(input);
-    free_args(args);
+    command_free(&cmd);
   } while (should_run);
 }
 
