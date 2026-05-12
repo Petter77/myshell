@@ -59,15 +59,20 @@ command_t parse_command(char **args) {
         free(args[i]);
         args[i] = NULL;
         args[i+1] = NULL;       
+        i++;
       } else if (strcmp(args[i], ">>") == 0 && args[i+1] != NULL) {
         cmd.redirect_out = args[i+1];
         cmd.append = 1;
         free(args[i]);
         args[i] = NULL;
         args[i+1] = NULL;       
-        free(args[i]);
+        i++;
       } else if (strcmp(args[i], "<") == 0 && args[i+1] != NULL) {
         cmd.redirect_in = args[i+1];
+        free(args[i]);
+        args[i] = NULL;
+        args[i+1] = NULL;       
+        i++;
       }
     }
 
