@@ -4,7 +4,7 @@
 #include "command.h"
 
 char* get_input();
-char** get_args(char *input);
-command_t parse_command(char** args);
+char** get_tokens(char *input);
+command_t parse_command(char** start, char** end);
 
 #endif  // MYSHELL_INCLUDE_INPUT_H_

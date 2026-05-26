@@ -4,9 +4,8 @@
 #include <stdio.h>
 
 #include "../include/input.h"
-#include "../include/execute.h"
 #include "../include/prompt.h"
-#include "../include/command.h"
+#include "../include/pipeline.h"
 
 void shell_loop(void) {
   char *input;
@@ -16,7 +15,7 @@ void shell_loop(void) {
   do {
     print_indicator(proc_status);
     input = get_input();
-    char** args = get_args(input);
+    char** args = get_tokens(input);
 
     if (args[0] == NULL) {
       for (int i = 0; args[i] != NULL; i++) {
@@ -25,11 +24,10 @@ void shell_loop(void) {
       free(input);
       continue;
     }
-    command_t cmd = parse_command(args);
-    execute(cmd, &proc_status);
-
+    pipeline_t pipe = build_pipeline(args);
+    execute_pipeline(&pipe, &proc_status);
+    print_pipeline(&pipe);
     free(input);
-    command_free(&cmd);
   } while (should_run);
 }
 

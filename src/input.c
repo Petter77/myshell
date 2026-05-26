@@ -14,7 +14,7 @@ char* get_input() {
   return input;
 }
 
-char **get_args(char *input) {
+char **get_tokens(char *input) {
   int cap = 2;
   int count = 0;
   char **args = malloc(sizeof(char *) * cap);
@@ -45,37 +45,42 @@ char **get_args(char *input) {
   return args;
 }
 
-command_t parse_command(char **args) {
-    command_t cmd;
-    cmd.args = args;
-    cmd.redirect_in = NULL;
-    cmd.redirect_out = NULL;
-    cmd.append = 0;
+command_t parse_command(char** start, char** end) {
+  size_t len = end - start + 1;
+  char** args = malloc(sizeof(char*) * (len + 1));
+  memcpy(args, start, len * sizeof(char*));
+  args[len] = NULL;
+  command_t cmd;
+  cmd.args = args;
+  cmd.redirect_in = NULL;
+  cmd.redirect_out = NULL;
+  cmd.append = 0;
 
-    for (int i = 0; args[i] != NULL; i++) {
-      if (strcmp(args[i], ">") == 0 && args[i+1] != NULL) {
-        cmd.redirect_out = args[i+1];
-        cmd.append = 0;
-        free(args[i]);
-        args[i] = NULL;
-        args[i+1] = NULL;       
-        i++;
-      } else if (strcmp(args[i], ">>") == 0 && args[i+1] != NULL) {
-        cmd.redirect_out = args[i+1];
-        cmd.append = 1;
-        free(args[i]);
-        args[i] = NULL;
-        args[i+1] = NULL;       
-        i++;
-      } else if (strcmp(args[i], "<") == 0 && args[i+1] != NULL) {
-        cmd.redirect_in = args[i+1];
-        free(args[i]);
-        args[i] = NULL;
-        args[i+1] = NULL;       
-        i++;
-      }
+  for (int i = 0; args[i] != NULL; i++) {
+    if (strcmp(args[i], ">") == 0 && args[i+1] != NULL) {
+      cmd.redirect_out = args[i+1];
+      cmd.append = 0;
+      free(args[i]);
+      args[i] = NULL;
+      args[i+1] = NULL;       
+      i++;
+    } else if (strcmp(args[i], ">>") == 0 && args[i+1] != NULL) {
+      cmd.redirect_out = args[i+1];
+      cmd.append = 1;
+      free(args[i]);
+      args[i] = NULL;
+      args[i+1] = NULL;       
+      i++;
+    } else if (strcmp(args[i], "<") == 0 && args[i+1] != NULL) {
+      cmd.redirect_in = args[i+1];
+      free(args[i]);
+      args[i] = NULL;
+      args[i+1] = NULL;       
+      i++;
     }
+  }
 
-    return cmd;
+  return cmd;
 }
+
 
