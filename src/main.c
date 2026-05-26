@@ -26,8 +26,9 @@ void shell_loop(void) {
     }
     pipeline_t pipe = build_pipeline(args);
     execute_pipeline(&pipe, &proc_status);
-    print_pipeline(&pipe);
     free(input);
+    free(args);
+    pipeline_free(&pipe);
   } while (should_run);
 }
 

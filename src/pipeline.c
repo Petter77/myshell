@@ -30,10 +30,6 @@ pipeline_t build_pipeline(char** tokens) {
       end++;
     }
   }
-  printf("count: %zu\n", pipeline.count);
-  for (size_t i = 0; i < pipeline.count; i++) {
-    printf("cmd %zu: %s\n", i, pipeline.commands[i].args[0]);
-  }
   return pipeline;
 }
 
@@ -41,6 +37,13 @@ void execute_pipeline(pipeline_t *pipeline, int* exit_code) {
   if (pipeline->count == 1) {
     execute(pipeline->commands[0], exit_code);
   }
+}
+
+void pipeline_free(pipeline_t *pipeline) {
+    for (size_t i = 0; i < pipeline->count; i++) {
+        command_free(&pipeline->commands[i]);
+    }
+    free(pipeline->commands);
 }
 
 void print_pipeline(pipeline_t *pipeline) {
