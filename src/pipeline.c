@@ -41,29 +41,36 @@ void execute_pipeline(pipeline_t *pipeline, int* exit_code) {
     execute(pipeline->commands[0], exit_code);
   } else {
     int proc_status;
-    int fd[2];
-    pid_t pid[2];
-    pipe(fd);
-    pid[0] = fork();
-    if (pid[0] == 0) { // ls 
-      dup2(fd[1], STDOUT_FILENO);
-      close(fd[0]);
-      close(fd[1]);
-      execvp(pipeline->commands[0].args[0], pipeline->commands[0].args);
-    } 
-
-    pid[1] = fork();
-    if (pid[1] == 0) { // grep 
-      dup2(fd[0], STDIN_FILENO);
-      close(fd[0]);
-      close(fd[1]);
-      execvp(pipeline->commands[1].args[0], pipeline->commands[1].args);
+    int fd[pipeline->count][2];
+    pid_t pid[pipeline->count];
+    for (size_t i = 0; i < pipeline->count; i++) {
+      pipe(fd[i]);
     }
 
-    close(fd[0]);
-    close(fd[1]);
-    waitpid(pid[0], &proc_status, 0);
-    waitpid(pid[1], &proc_status, 0);
+    for (size_t i = 0; i < pipeline->count; i++) {
+      pid[i] = fork();
+      if (pid[i] == 0) {
+        if (i > 0) {
+          dup2(fd[i-1][0], STDIN_FILENO);
+        }
+        if (i < pipeline->count - 1) {
+          dup2(fd[i][1], STDOUT_FILENO);
+        }
+        for (size_t j = 0; j < pipeline->count - 1; j++) {
+          close(fd[j][0]);
+          close(fd[j][1]);
+        }
+        execvp(pipeline->commands[i].args[0], pipeline->commands[i].args);
+      }
+    }
+    for (size_t i = 0; i < pipeline->count; i++) {
+      close(fd[i][0]);
+      close(fd[i][1]);
+    }
+
+    for (size_t i = 0; i < pipeline->count; i++) {
+      waitpid(pid[i], &proc_status, 0);
+    }
   }
 }
 
