@@ -3,7 +3,6 @@
 #include <sys/wait.h>
 #include <stdio.h>
 #include "../include/pipeline.h"
-#include "../include/input.h"
 #include "../include/execute.h"
 
 pipeline_t build_pipeline(char** tokens) {
@@ -18,7 +17,7 @@ pipeline_t build_pipeline(char** tokens) {
   char** start = tokens;
   char** end = tokens;
   size_t command_index = 0;
-  for (size_t i = 0;; i++) {
+  while(1) {
     if (*end == NULL) {
       pipeline.commands[command_index] = parse_command(start, end-1);
       command_index++;
@@ -61,7 +60,8 @@ void execute_pipeline(pipeline_t *pipeline, int* exit_code) {
           close(fd[j][1]);
         }
         execvp(pipeline->commands[i].args[0], pipeline->commands[i].args);
-      }
+        perror(pipeline->commands[i].args[0]);
+        exit(EXIT_FAILURE);}
     }
     for (size_t i = 0; i < pipeline->count; i++) {
       close(fd[i][0]);

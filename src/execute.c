@@ -42,7 +42,7 @@ void execute(command_t cmd, int* proc_status) {
   pid_t pid = fork();
   if (pid == 0) {
     if(cmd.redirect_in) {
-      int flags = O_RDONLY | O_CREAT;
+      int flags = O_RDONLY;
       int fd = open(cmd.redirect_in, flags, 0644);
       dup2(fd, STDIN_FILENO);
       close(fd);

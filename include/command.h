@@ -1,5 +1,4 @@
-#ifndef MYSHELL_INCLUDE_COMMAND_H_
-#define MYSHELL_INCLUDE_COMMAND_H_
+#pragma once
 
 #include <stdlib.h>
 
@@ -10,6 +9,6 @@ typedef struct {
   int append;
 } command_t;
 
+command_t parse_command(char** start, char** end);
 void command_free(command_t* com);
 
-#endif  // MYSHELL_INCLUDE_COMMAND_H_
